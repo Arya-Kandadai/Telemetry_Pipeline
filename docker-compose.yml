@@ -1,0 +1,46 @@
+# Runs InfluxDB, the weather station logger and two Kinesis forwarders.
+# The LabJack and light logger need USB access, so run those on the host instead.
+services:
+  influxdb:
+    image: influxdb:2.7
+    container_name: influxdb
+    restart: always
+    ports:
+      - "8086:8086"
+    volumes:
+      - influxdb-data:/var/lib/influxdb2
+
+  weather-station:
+    build: ./weather-station
+    container_name: weather-station
+    restart: always
+    env_file: .env
+    environment:
+      - INFLUX_URL=http://influxdb:8086
+    depends_on:
+      - influxdb
+
+  kinesis-scout:
+    build: ./influx-to-kinesis
+    container_name: kinesis-scout
+    restart: always
+    env_file: .env
+    environment:
+      - INFLUX_URL=http://influxdb:8086
+      - INFLUX_BUCKET=ScoutWeather
+    depends_on:
+      - influxdb
+
+  kinesis-labjack:
+    build: ./influx-to-kinesis
+    container_name: kinesis-labjack
+    restart: always
+    env_file: .env
+    environment:
+      - INFLUX_URL=http://influxdb:8086
+      - INFLUX_BUCKET=JabLack
+    depends_on:
+      - influxdb
+
+volumes:
+  influxdb-data:

@@ -1,0 +1,17 @@
+# Secrets
+.env
+
+# Data and generated files (too big / not for public)
+*.csv
+*.xlsx
+*.pdf
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# macOS / Office
+.DS_Store
+~$*
